@@ -75,3 +75,30 @@ Each has a hook, what to film and the edit command. `IN.mp4` is your upload.
    `python3 scripts/edit_reel.py IN.mp4 out.mp4 --slowmo 3-4@0.3 --hook "The 0.5 seconds that decide a 4x400"`
 
 Run any hook through `/ig-reel` to score it before you shoot.
+
+## Style: dark quote reel ("show up anyway")
+
+Reference: @nicogeis03, a HYROX treadmill clip built from a template by tomas.klapuch.
+1,498 likes, 22 comments, **161 shares**. Shares are about 11% of likes, which is
+high: quote reels get sent to friends, and shares are what reach non-followers.
+Formula: 5-10s of moody training footage (face hidden or turned away), dark
+grade, big condensed serif in white, the payoff line in red, a second red
+line lower down. No talking needed.
+
+`scripts/quote_reel.py` recreates the look (font: Instrument Serif, OFL):
+
+    python3 scripts/quote_reel.py IN.mp4 out.mp4 --end 9 --darkness 0.75 \
+      --block "560:THE DAYS YOU|DON'T WANT TO|ARE THE DAYS|THAT COUNT|*THE MOST.*" \
+      --block "1250:*SHOW UP ANYWAY.*"
+
+Lines written for a 400m hurdler. Use your own words where these aren't true for you:
+
+1. `NOBODY CLAPS|FOR HURDLE 8|ON A TUESDAY|IN NOVEMBER.|*THAT'S WHERE*|*AUGUST IS WON.*`
+2. `400 METRES.|10 HURDLES.|*THE LAST 40*|*DECIDE EVERYTHING.*`
+3. `YOUR LEGS QUIT|AT HURDLE 7.|*YOUR HEAD*|*DOESN'T GET TO.*`
+4. `NOBODY SEES|THE 6AM REPS.|*EVERYBODY SEES*|*THE RESULT.*`
+5. `IT DOESN'T|GET EASIER.|*YOU GET*|*FASTER.*`
+6. `FOUR LAPS|FOR THE TEAM.|*ONE BATON.*|*NO EXCUSES.*` (for 4x400 footage)
+
+Best footage: you from behind or the side, between reps. Hands on knees after
+a 300, walking back to the blocks, towel over your head, spikes going on.
