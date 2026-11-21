@@ -81,6 +81,7 @@ def main():
     ap.add_argument("--size", type=int, default=92, help="white line font size")
     ap.add_argument("--red-scale", type=float, default=1.45)
     ap.add_argument("--darkness", type=float, default=0.55, help="0 = original, 1 = black")
+    ap.add_argument("--saturation", type=float, default=0.7, help="1 = original colour")
     ap.add_argument("--music")
     args = ap.parse_args()
 
@@ -94,7 +95,7 @@ def main():
     inputs = [*trim, "-i", args.input, "-i", png]
     grade = (f"scale={W}:{H}:force_original_aspect_ratio=increase,"
              f"crop={W}:{H}:(in_w-{W})*{args.focus}:(in_h-{H})/2,setsar=1,fps=30,"
-             f"eq=contrast=1.12:saturation=0.7:gamma={1 - args.darkness * 0.45:.3f},"
+             f"eq=contrast=1.12:saturation={args.saturation}:gamma={1 - args.darkness * 0.45:.3f},"
              f"vignette=PI/4,"
              f"drawbox=0:0:{W}:{H}:black@{args.darkness * 0.5:.2f}:t=fill")
     fg = [f"[0:v]{grade}[bg]", "[bg][1:v]overlay=0:0[vout]"]
