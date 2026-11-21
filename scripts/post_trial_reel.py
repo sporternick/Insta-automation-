@@ -27,7 +27,11 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-API = "https://graph.instagram.com/v27.0"
+VERSION = "v27.0"
+# Instagram Login tokens (IG...) use graph.instagram.com; Facebook Login
+# tokens (EAA...) use graph.facebook.com and reach the Instagram account
+# through the Facebook Page it is linked to. Set with --api.
+API = f"https://graph.instagram.com/{VERSION}"
 # Placeholder when no token is set locally; the cloud proxy replaces it.
 TOKEN = os.environ.get("IG_ACCESS_TOKEN", "proxy-injected")
 
@@ -50,13 +54,29 @@ def call(method, path, params=None):
         sys.exit(f"API error {e.code} on {method} {path}: {body}")
 
 
-def whoami():
-    return call("GET", "me", {"fields": "user_id,username,account_type"})
+def whoami(api):
+    global API
+    if api == "instagram":
+        API = f"https://graph.instagram.com/{VERSION}"
+        return call("GET", "me", {"fields": "user_id,username,account_type"})
+    API = f"https://graph.facebook.com/{VERSION}"
+    pages = call("GET", "me/accounts",
+                 {"fields": "name,instagram_business_account{id,username}"}).get("data", [])
+    linked = [p for p in pages if p.get("instagram_business_account")]
+    if not linked:
+        sys.exit("No Facebook Page with a linked Instagram account is visible to this token. "
+                 f"Pages seen: {[p.get('name') for p in pages] or 'none'}. Link your Instagram "
+                 "account to a Page and grant pages_show_list + instagram_content_publish.")
+    ig = linked[0]["instagram_business_account"]
+    return {"user_id": ig["id"], "username": ig.get("username"),
+            "account_type": f"via Page '{linked[0].get('name')}'"}
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--whoami", action="store_true", help="check the token and print the account")
+    ap.add_argument("--api", choices=["facebook", "instagram"], default="facebook",
+                    help="facebook for EAA... tokens (default), instagram for IG... tokens")
     ap.add_argument("--video-url", help="public HTTPS URL of the .mp4 (Instagram fetches it)")
     ap.add_argument("--caption", default="")
     ap.add_argument("--caption-file")
@@ -66,7 +86,7 @@ def main():
     ap.add_argument("--publish", action="store_true", help="actually publish (default: dry run)")
     args = ap.parse_args()
 
-    me = whoami()
+    me = whoami(args.api)
     if args.whoami:
         print(json.dumps(me, indent=2))
         return
